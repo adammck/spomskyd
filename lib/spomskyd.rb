@@ -2,11 +2,8 @@
 # vim: noet
 
 
-# load rubysms via relative path, until we have a gem
-require File.expand_path(File.dirname(__FILE__) + "/../rubysms/lib/rubysms.rb")
-
-# load other stuff
 require "rubygems"
+require "rubysms"
 require "net/http"
 require "mongrel"
 require "rack"
@@ -137,5 +134,3 @@ class SpomskyApp < SMS::App
 		[code, {"content-type" => "text/plain"}.merge(more_headers), body]
 	end
 end
-
-SpomskyApp.serve!

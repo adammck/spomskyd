@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+# vim: noet
+
+require "rubygems"
+require "spomskyd"
+SpomskyApp.serve!
