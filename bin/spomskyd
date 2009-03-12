@@ -1,6 +1,33 @@
 #!/usr/bin/env ruby
 # vim: noet
 
-require "rubygems"
-require "spomskyd"
-SpomskyApp.serve!
+begin
+	# try loading the lib via a relative path
+	# first, in case we're running on the trunk
+	dev_dir = File.dirname(__FILE__) + "/.."
+	dev_path = "#{dev_dir}/lib/spomskyd.rb"
+	require File.expand_path(dev_path)
+	
+rescue LoadError
+	begin
+	
+		# couldn't load via relative
+		# path, so try loading the gem
+		require "rubygems"
+		require "spomskyd"
+	end
+end
+
+# if a conf file was passed, attempt to read
+# and eval it (they're just ruby code for now)
+# otherwise, default to no arguments, and let
+# rubysms fire up the default backends
+if ARGV.empty?
+	args = []
+	
+else
+	conf = File.new(ARGV[0]).read
+	args = eval(conf)
+end
+
+SpomskyApp.serve!(*args)

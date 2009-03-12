@@ -3,11 +3,13 @@
 
 
 require "rubygems"
-require "rubysms"
 require "net/http"
 require "mongrel"
 require "rack"
 require "uuid"
+
+require "rubysms"
+#require File.expand_path(File.dirname(__FILE__) + "/../../rubysms/lib/rubysms.rb")
 
 
 class SpomskyApp < SMS::App
