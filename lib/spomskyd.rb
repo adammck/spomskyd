@@ -8,8 +8,22 @@ require "mongrel"
 require "rack"
 require "uuid"
 
-require "rubysms"
-#require File.expand_path(File.dirname(__FILE__) + "/../../rubysms/lib/rubysms.rb")
+
+begin
+	# try loading rubysms via a relative path
+	# first, in case we're running on the trunk
+	projects_dir = File.dirname(__FILE__) + "/../.."
+	rubysms_path = "#{projects_dir}/rubysms/lib/rubysms.rb"
+	require File.expand_path(rubysms_path)
+	
+rescue LoadError
+	begin
+	
+		# couldn't load via relative
+		# path, so try loading the gem
+		require "rubysms"
+	end
+end
 
 
 class SpomskyApp < SMS::App
