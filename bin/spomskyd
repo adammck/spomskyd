@@ -2,10 +2,15 @@
 # vim: noet
 
 begin
+
+	# if this file is a symlink (which is probably is, since rubygems
+	# symlinks bin files into /usr/bin), find the original source file
+	this_file = File.symlink?(__FILE__) ? \
+		File.readlink(__FILE__) : __FILE__
+	
 	# try loading the lib via a relative path
 	# first, in case we're running on the trunk
-	dev_dir = File.dirname(__FILE__) + "/.."
-	dev_path = "#{dev_dir}/lib/spomskyd.rb"
+	dev_path = File.expand_path(File.dirname(this_file) + "/../lib/spomskyd.rb")
 	require File.expand_path(dev_path)
 	
 rescue LoadError
@@ -18,16 +23,14 @@ rescue LoadError
 	end
 end
 
-# if a conf file was passed, attempt to read
-# and eval it (they're just ruby code for now)
-# otherwise, default to no arguments, and let
-# rubysms fire up the default backends
-if ARGV.empty?
-	args = []
+# pass the arguments straight on to rubysms, tucked inside an array to
+# indicate that we only want a single backend. this is rather obscure
+# usage, but allows super (undocumented!) flexibility
+if(ARGV.length > 0)
+	SpomskyApp.serve!(ARGV)
 	
 else
-	conf = File.new(ARGV[0]).read
-	args = eval(conf)
+	puts "Usage: spomskyd BACKEND [ARGUMENTS]"
+	puts "  To start local development"
+	puts "  mode, try `spomskyd HTTP`"
 end
-
-SpomskyApp.serve!(*args)
