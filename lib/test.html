@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+	<head>
+		<title>SPOMSKYd test</title>
+		<style type="text/css">
+			body {
+				font-size: 9pt sans-serif;
+			}
+			
+			label {
+				display: block;
+				font-size: 80%;
+				color: #888;
+			}
+			
+			input, textarea {
+				margin-bottom: 1em;
+			}
+		</style>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	</head>
+	<body>
+		<form action="http://localhost:8100/send" method="post">
+			<div>
+				<label for="fm-destination">Destination</label>
+				<input type="text" name="destination" id="fm-destination" />
+			</div>
+			<div>
+				<label for="fm-body">Body</label>
+				<textarea name="body" id="fm-body"></textarea>
+			</div>
+			<div>
+				<input type="submit" value="Submit" />
+			</div>
+		</form>
+	</body>
+</html>
