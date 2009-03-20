@@ -7,11 +7,11 @@ begin
 	# symlinks bin files into /usr/bin), find the original source file
 	this_file = File.symlink?(__FILE__) ? \
 		File.readlink(__FILE__) : __FILE__
-	
+
 	# try loading the lib via a relative path
 	# first, in case we're running on the trunk
-	dev_path = File.expand_path(File.dirname(this_file) + "/../lib/spomskyd.rb")
-	require File.expand_path(dev_path)
+	require (dev_path = File.expand_path(
+		File.dirname(this_file) + "/../lib/spomskyd.rb"))
 	
 rescue LoadError
 	begin
@@ -20,6 +20,14 @@ rescue LoadError
 		# path, so try loading the gem
 		require "rubygems"
 		require "spomskyd"
+		
+	rescue LoadError
+
+		# nothing worked, so re-raise
+		# with more useful information
+		raise LoadError.new(
+			"Couldn't load spomskyd.rb relatively (from " +\
+			"#{dev_path.inspect}) or via RubyGems")
 	end
 end
 
@@ -28,7 +36,7 @@ end
 # usage, but allows super (undocumented!) flexibility
 if(ARGV.length > 0)
 	SpomskyApp.serve!(ARGV)
-	
+
 else
 	puts "Usage: spomskyd BACKEND [ARGUMENTS]"
 	puts "  To start local development"
