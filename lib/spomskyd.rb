@@ -27,18 +27,25 @@ end
 
 
 class SpomskyApp < SMS::App
-	PORT = 8100
 	
+	def initialize(port)
+		@uuid = UUID.new()
+		@subscribers = {}
+		@port = port.to_i
+	end
 	
 	def start
-		@subscribers = {}
-		@uuid = UUID.new()
-		
-		# 
 		@rack_thread = Thread.new do
 			Rack::Handler::Mongrel.run(
-				method(:rack_app), :Port=>PORT)
+				method(:rack_app), :Port=>@port)
 		end
+		
+		# add the uri of this spomsky server
+		# to the screen log, for the curious
+		log [
+			"Started SPOMSKYd Application",
+			"URI: http://localhost:#{@port}/"
+		], :init
 	end
 	
 	
@@ -116,7 +123,6 @@ class SpomskyApp < SMS::App
 	end
 	
 	private
-	
 	
 	# Adds a URI to the @subscribers hash, to be
 	# notified (via HTTP) when an SMS arrives. Does

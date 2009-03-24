@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 # vim: noet
 
+
 begin
 
 	# if this file is a symlink (which is probably is, since rubygems
@@ -31,14 +32,49 @@ rescue LoadError
 	end
 end
 
-# pass the arguments straight on to rubysms, tucked inside an array to
-# indicate that we only want a single backend. this is rather obscure
-# usage, but allows super (undocumented!) flexibility
-if(ARGV.length > 0)
-	SpomskyApp.serve!(ARGV)
 
-else
-	puts "Usage: spomskyd BACKEND [ARGUMENTS]"
-	puts "  To start local development"
-	puts "  mode, try `spomskyd HTTP`"
-end
+# load option parser
+# from the ruby stdlib
+require "optparse"
+options = {}
+
+# parse the command-line options
+OptionParser.new do |opts|
+	options[:backend] = "HTTP"
+	options[:port] = 8100
+	
+	# display summary usage info
+	opts.banner = "Usage:\n" +\
+	              "    spomskyd [OPTIONS] [ARGUMENTS]"
+  opts.separator " "
+  opts.separator "Options:"
+	
+	# parse the BACKEND option
+	opts.on("-b", "--backend=BACKEND", "Start a RubySMS backend of the given type (default=HTTP)") do |b|
+		options[:backend] = b
+	end
+
+	# parse the PORT option
+	opts.on("-p", "--port=PORT", Integer, "Listen on a given TCP port (default=8100)") do |p|
+		options[:port] = p
+	end
+	
+	# print usage information
+	opts.on_tail("-h", "--help", "Show this message") do
+		puts opts
+		exit
+	end
+end.parse!
+
+
+# create a router with a single spomsky app. we
+# deliberately only support a single spomsky per
+# process, to keep the command-line args simple
+app = SpomskyApp.new(options[:port])
+router = SMS::Router.new
+router.add_app(app)
+
+# pass the remaining (non option) arguments
+# from the command line directly to 
+router.add_backend(options[:backend], *ARGV)
+router.serve_forever
