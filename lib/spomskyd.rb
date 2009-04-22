@@ -67,7 +67,7 @@ class SpomskyApp < SMS::App
 						log("Relaying to #{dest} via #{backend.label}")
 						SMS::Outgoing.new(backend, dest, post["body"]).send!
 					rescue StandardError => err
-						# do nothing!
+						return resp "Error while sending SMS: #{err}", 500
 					end
 				end
 				
