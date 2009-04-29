@@ -32,6 +32,10 @@ class SpomskyApp < SMS::App
 		@uuid = UUID.new()
 		@subscribers = {}
 		@port = port.to_i
+		
+		# to hold messages which were received while
+		# no subscribers were available to relay to
+		@pending = []
 	end
 	
 	def start
@@ -98,17 +102,17 @@ class SpomskyApp < SMS::App
 	# incoming SMS has arrived
 	def incoming(msg)
 		data = { :source => msg.sender.phone_number, :body => msg.text }
-		relayed_to = 0
 		
+		# "What?! There is NO USE CASE for discarding incoming
+		#  messages. Hold on to them or something!" -- Jonathan
 		if @subscribers.empty?
-			log("Message not relayed (no subscribers)", :warn)
-			return false
+			log("Message held (no subscribers)", :warn)
+			@pending.push(msg)
 		end
 		
 		@subscribers.each do |uuid, uri|
 			begin
 				res = Net::HTTP.post_form(URI.parse(uri), data)
-				relayed_to += 1
 			
 			# if something goes wrong... do nothing. a client
 			# has probably vanished without unsubscribing. TODO:
@@ -117,9 +121,6 @@ class SpomskyApp < SMS::App
 				log_exception(err, "Error while relaying to: #{uri}")
 			end
 		end
-		
-		suffix = (relayed_to > 1) ? "s" : ""
-		log("Relayed to #{relayed_to} subscriber#{suffix}")
 	end
 	
 	private
@@ -137,8 +138,20 @@ class SpomskyApp < SMS::App
 				the_uri == uri
 		end
 		
+		# add this subscriber
 		uuid = @uuid.generate
 		@subscribers[uuid] = uri
+		
+		# if there are any pending messages,
+		# log and relay them to this subscriber
+		unless @pending.empty?
+			log "Relaying #{@pending.length} held messages"
+			
+			@pending.each do |msg|
+				incoming(msg)
+			end
+		end
+		
 		uuid
 	end
 	
