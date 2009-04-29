@@ -147,7 +147,7 @@ class SpomskyApp < SMS::App
 		unless @pending.empty?
 			log "Relaying #{@pending.length} held messages"
 			
-			@pending.each do |msg|
+			while msg = @pending.shift
 				incoming(msg)
 			end
 		end

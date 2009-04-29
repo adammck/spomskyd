@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
 	s.name     = "spomskyd"
-	s.version  = "0.2"
+	s.version  = "0.2.1"
 	s.date     = "2009-04-29"
 	s.summary  = "RubySMS application to implement the OMC SMS Proxy Protocol"
 	s.email    = "amckaig@unicef.org"
