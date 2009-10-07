@@ -101,7 +101,10 @@ class SpomskyApp < SMS::App
 	# Notify each of @subscribers that an
 	# incoming SMS has arrived
 	def incoming(msg)
-		data = { :source => msg.sender.phone_number, :body => msg.text }
+		data = {
+			"source" => msg.sender.phone_number,
+			"body"   => msg.text
+		}
 		
 		# "What?! There is NO USE CASE for discarding incoming
 		#  messages. Hold on to them or something!" -- Jonathan
